@@ -30,8 +30,28 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 
+// routes/web.php
+Auth::routes();
 
-Route::resource('orders', OrderController::class);
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// Cart routes
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add/{productId}', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update/{itemId}', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove/{itemId}', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/migrate', [CartController::class, 'migrateCart'])->name('cart.migrate');
+
+// Order routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+});
+
+// Route::resource('orders', OrderController::class);
 
 
 Route::get('/db-test', function () {
@@ -71,3 +91,7 @@ Route::delete('/products/{product}', [ProductController::class, 'destroy'])->nam
 
 
 
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

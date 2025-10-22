@@ -1,16 +1,9 @@
-<h1>Giỏ hàng</h1>
-@if($cart && $cart->items->count())
-<ul>
-@foreach($cart->items as $item)
-    <li>{{ $item->product->name }} x {{ $item->quantity }} - {{ $item->product->price * $item->quantity }} VND
-        <form method="POST" action="{{ route('cart.remove',$item->id) }}">
-            @csrf @method('DELETE')
-            <button>Xóa</button>
-        </form>
-    </li>
-@endforeach
-</ul>
-<a href="{{ route('orders.checkout') }}">Thanh toán</a>
-@else
-<p>Giỏ hàng trống</p>
+@if($cart->items->count() > 0)
+<div class="row mt-4">
+    <div class="col-12 text-end">
+        <a href="{{ route('orders.create') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-bag"></i> Tiến hành đặt hàng
+        </a>
+    </div>
+</div>
 @endif

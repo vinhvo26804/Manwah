@@ -39,4 +39,38 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function getCurrentCart()
+    {
+        return $this->carts()->firstOrCreate([]);
+    }
+   public function getAuthIdentifierName()
+    {
+        return 'full_name';
+    }
+
+    // Kiểm tra role
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isStaff()
+    {
+        return $this->role === 'staff';
+    }
+
+    public function isCustomer()
+    {
+        return $this->role === 'customer';
+    }
 }
