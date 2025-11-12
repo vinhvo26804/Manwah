@@ -12,7 +12,7 @@ class ProductController extends Controller
         $products = Product::all();
         return view('products.index', compact('products'));
     }
-    
+
     public function create() {
         $categories = Category::all();
         return view('products.create', compact('categories')    );
@@ -44,7 +44,7 @@ class ProductController extends Controller
         ]);
         $product->update($request->all());
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
-    }   
+    }
 
     public function destroy(Product $product) {
         $product->delete();
@@ -52,8 +52,18 @@ class ProductController extends Controller
     }
 
 
+    // =========================
+    // Method Menu cho khách hàng
+    // =========================
+    public function menu()
+    {
+        // Lấy tất cả sản phẩm để hiển thị cho khách hàng
+        $products = Product::all();
 
-    
-        
-     
+        // Trả về view menu.blade.php
+        return view('menu.index', compact('products'));
+    }
+
+
+
 }

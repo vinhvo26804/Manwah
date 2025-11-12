@@ -6,10 +6,10 @@
         <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- Thêm dòng này -->
 
     <title>Manwah Restaurant</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
           <style>
@@ -34,6 +34,7 @@
             border-color: #b71c1c;
         }
     </style>
+    @yield('scripts');
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -41,11 +42,11 @@
             <a class="navbar-brand" href="{{ url('/dashboard') }}">
                 <i class="fas fa-utensils me-2"></i>Manwah Restaurant
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -59,7 +60,7 @@
                         </a>
                     </li>
                 </ul>
-                
+
                 <ul class="navbar-nav">
                     @guest
                         <li class="nav-item">
@@ -74,7 +75,7 @@
                         </li>
                     @else
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user me-1"></i>{{ Auth::user()->full_name }}
                                 @if(Auth::user()->isAdmin())
@@ -87,14 +88,14 @@
                                 <li><a class="dropdown-item" href="{{ route('orders.index') }}">
                                     <i class="fas fa-list me-2"></i>Đơn hàng của tôi
                                 </a></li>
-                                
+
                                 @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ route('orders.index') }}">
                                         <i class="fas fa-cog me-2"></i>Quản lý đơn hàng
                                     </a></li>
                                 @endif
-                                
+
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
@@ -136,7 +137,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         // Auto hide alerts after 5 seconds
         setTimeout(function() {
