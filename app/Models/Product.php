@@ -15,10 +15,14 @@ use App\Models\Order;
 
 class Product extends Model
 {
-    use  HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens;
 
     protected $fillable = [
-        'name', 'description', 'price', 'stock', 'category_id'
+        'name',
+        'description',
+        'price',
+        'stock',
+        'category_id'
     ];
 
     protected $hidden = [
@@ -29,13 +33,17 @@ class Product extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function category() {
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function orders() {
+    public function orders()
+    {
         return $this->belongsToMany(Order::class)->withPivot('quantity', 'price');
     }
+
+
 
 
 }

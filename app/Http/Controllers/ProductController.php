@@ -8,16 +8,19 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $products = Product::all();
         return view('products.index', compact('products'));
     }
 
-    public function create() {
+    public function create()
+    {
         $categories = Category::all();
-        return view('products.create', compact('categories')    );
+        return view('products.create', compact('categories'));
     }
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -30,11 +33,13 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
-    public function edit(Product $product) {
+    public function edit(Product $product)
+    {
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }
-    public function update(Request $request, Product $product) {
+    public function update(Request $request, Product $product)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -46,7 +51,8 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }
 
-    public function destroy(Product $product) {
+    public function destroy(Product $product)
+    {
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
@@ -55,15 +61,20 @@ class ProductController extends Controller
     // =========================
     // Method Menu cho khách hàng
     // =========================
-    public function menu()
+    public function menu(Request $request)
     {
-        // Lấy tất cả sản phẩm để hiển thị cho khách hàng
-        $products = Product::all();
+        $categories = Category::all();
 
-        // Trả về view menu.blade.php
-        return view('menu.index', compact('products'));
+        $query = Product::where('status', 'active');
+
+        if ($request->has('category_id') && $request->category_id != null) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $products = $query->get();
+
+        return view('menu.index', compact('products', 'categories'));
     }
-
 
 
 }

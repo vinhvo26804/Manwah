@@ -29,12 +29,26 @@ Route::get('/db-test', function () {
 
 // Menu cho khách hàng
 Route::get('/menu', [ProductController::class, 'menu'])->name('menu');
+// Hiển thị theo danh mục sản phẩm
+Route::get('/menu/category/{categoryId}', [ProductController::class, 'filterByCategory'])->name('menu.filter');
+
+
+// Giỏ hàng
+// Route::middleware('auth')->group(function () {
+//     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+//     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+// });
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 
 // Cart routes (công khai)
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add/{productId}', [CartController::class, 'add'])->name('cart.add');
-Route::post('/cart/update/{itemId}', [CartController::class, 'update'])->name('cart.update');
-Route::post('/cart/remove/{itemId}', [CartController::class, 'remove'])->name('cart.remove');
+// Route::post('/cart/add/{productId}', [CartController::class, 'add'])->name('cart.add');
+// Route::post('/cart/update/{itemId}', [CartController::class, 'update'])->name('cart.update');
+// Route::post('/cart/remove/{itemId}', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/{id}', [CartController::class, 'add'])->name('cart.add');
+Route::put('/cart/{id}', [CartController::class, 'update']);
+Route::delete('/cart/{id}', [CartController::class, 'remove']);
 Route::post('/cart/migrate', [CartController::class, 'migrateCart'])->name('cart.migrate');
 
 // Routes yêu cầu ĐĂNG NHẬP
