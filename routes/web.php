@@ -87,3 +87,9 @@ Route::post('reset-password', [App\Http\Controllers\Auth\ResetPasswordController
 
 // Authentication routes (Laravel UI)
 Auth::routes();
+<<<<<<< Updated upstream
+=======
+Route::get('/', function () {
+    return view('landing_guest');   
+})->name('landing');
+>>>>>>> Stashed changes
