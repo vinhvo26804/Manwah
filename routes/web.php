@@ -4,86 +4,79 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\DashboardController; // THÊM DÒNG NÀY
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\TableController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 
-// Route trang chủ - HIỂN THỊ LOGIN
+
+// ============================
+//   TRANG CHỦ → ĐĂNG NHẬP
+// ============================
 Route::get('/', function () {
     return view('auth.login');
 });
 
-// Routes công khai (không cần đăng nhập)
-Route::get('/db-test', function () {
-    try {
-        DB::connection()->getPdo();
-        return view('welcome');
-    } catch (\Exception $e) {
-        return "❌ Lỗi kết nối DB: " . $e->getMessage();
-    }
-});
-
-// Menu cho khách hàng
-Route::get('/menu', [ProductController::class, 'menu'])->name('menu');
-// Hiển thị theo danh mục sản phẩm
-Route::get('/menu/category/{categoryId}', [ProductController::class, 'filterByCategory'])->name('menu.filter');
+Route::middleware('auth')->group(function () {
+    // Chọn bàn
+    Route::get('/choose-table', [TableController::class, 'choose'])->name('choose.table');
+    Route::post('/choose-table', [TableController::class, 'setTable'])->name('set.table');
+    Route::post('/table/{table}/release', [TableController::class, 'releaseTable'])->name('table.release');
 
 
-// Giỏ hàng
-// Route::middleware('auth')->group(function () {
-//     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-//     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-// });
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    // Menu theo bàn
+    Route::get('/table/{table}/menu', [ProductController::class, 'menu'])->name('table.menu');
 
-// Cart routes (công khai)
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-// Route::post('/cart/add/{productId}', [CartController::class, 'add'])->name('cart.add');
-// Route::post('/cart/update/{itemId}', [CartController::class, 'update'])->name('cart.update');
-// Route::post('/cart/remove/{itemId}', [CartController::class, 'remove'])->name('cart.remove');
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/{id}', [CartController::class, 'add'])->name('cart.add');
-Route::put('/cart/{id}', [CartController::class, 'update']);
-Route::delete('/cart/{id}', [CartController::class, 'remove']);
-Route::post('/cart/migrate', [CartController::class, 'migrateCart'])->name('cart.migrate');
+    // Giỏ hàng theo bàn
+    Route::get('/table/{table}/cart', [CartController::class, 'index'])->name('table.cart');
+    Route::post('/table/{table}/cart/add', [CartController::class, 'add'])->name('table.cart.add');
+    Route::put('/table/{table}/cart/item/{id}', [CartController::class, 'update'])->name('table.cart.update');
+    Route::delete('/table/{table}/cart/item/{id}', [CartController::class, 'remove'])->name('table.cart.remove');
+    Route::post('/table/{table}/cart/clear', [CartController::class, 'clear'])->name('table.cart.clear');
 
-// Routes yêu cầu ĐĂNG NHẬP
-Route::middleware(['auth'])->group(function () {
+
+    // Cập nhật món
+    Route::put('/table/{table}/cart/item/{id}', [CartController::class, 'update'])->name('table.cart.update');
+
+    // Xóa món
+    Route::delete('/table/{table}/cart/item/{id}', [CartController::class, 'remove'])->name('table.cart.remove');
+
+
+    // Hóa đơn theo bàn
+    Route::get('/table/{table}/order/create', [OrderController::class, 'create'])->name('table.order.create');
+    Route::post('/table/{table}/order', [OrderController::class, 'store'])->name('table.order.store');
+
+
+    // ============================
+//     ADMIN / NHÂN VIÊN
+// ============================
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('Dashboard');
 
     // Users
-    Route::get('/users', [UsersController::class, 'index'])->name('users.index');
-    Route::get('/users/create', [UsersController::class, 'create'])->name('users.create');
-    Route::post('/users', [UsersController::class, 'store'])->name('users.store');
-    Route::get('/users/{user}/edit', [UsersController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [UsersController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
+    Route::resource('users', UsersController::class)->except(['show']);
 
     // Products
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
-    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::resource('products', ProductController::class)->except(['show']);
 
-    // Orders
+    // Orders admin view
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
-    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
-// Password Reset Routes
-Route::get('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-Route::get('reset-password/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
 
-// Authentication routes (Laravel UI)
+
+// ============================
+//     PASSWORD RESET
+// ============================
+Route::get('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])
+    ->name('password.request');
+Route::post('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->name('password.email');
+Route::get('reset-password/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])
+    ->name('password.reset');
+Route::post('reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])
+    ->name('password.update');
+
 Auth::routes();

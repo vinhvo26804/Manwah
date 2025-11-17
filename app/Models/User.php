@@ -18,7 +18,13 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'full_name', 'email','password', 'status', 'phone', 'address', 'role'
+        'full_name',
+        'email',
+        'password',
+        'status',
+        'phone',
+        'address',
+        'role'
     ];
 
     /**
@@ -53,10 +59,10 @@ class User extends Authenticatable
     {
         return $this->carts()->firstOrCreate([]);
     }
-   public function getAuthIdentifierName()
-    {
-        return 'full_name';
-    }
+    //    public function getAuthIdentifierName()
+//     {
+//         return 'full_name';
+//     }
 
     // Kiểm tra role
     public function isAdmin()

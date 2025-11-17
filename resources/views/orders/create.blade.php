@@ -1,101 +1,76 @@
 @extends('layouts.app')
 
-@section('title', 'Xác nhận đơn hàng')
+@section('title', 'Tạo hóa đơn')
 
 @section('content')
-<div class="container">
-    <h2>Xác nhận đơn hàng</h2>
-    
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+    <div class="container my-4">
+        <h2 class="mb-4 text-center">Hóa đơn bàn {{ $tableId }}</h2>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Thông tin món ăn</h5>
-                </div>
-                <div class="card-body">
-                    @foreach($cart->items as $item)
-                    <div class="row mb-3 border-bottom pb-3">
-                        <div class="col-2">
-                            @if($item->product->image)
-                                <img src="{{ asset('storage/' . $item->product->image) }}" 
-                                     alt="{{ $item->product->name }}" 
-                                     class="img-fluid" style="height: 60px; object-fit: cover;">
-                            @else
-                                <div class="bg-light d-flex align-items-center justify-content-center" 
-                                     style="height: 60px; width: 60px;">
-                                    <i class="fas fa-utensils"></i>
+        @if(session('success'))
+            <div class="alert alert-success text-center">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger text-center">{{ session('error') }}</div>
+        @endif
+
+        <form action="{{ route('table.order.store', ['table' => $tableId]) }}" method="POST">
+            @csrf
+
+            <div class="row g-3">
+                @php $total = 0; @endphp
+                @foreach($cart->items as $item)
+                    @php $total += $item->product->price * $item->quantity; @endphp
+                    <div class="col-md-6">
+                        <div class="card shadow-sm rounded-3 h-100">
+                            <div class="row g-0">
+                                <div class="col-4">
+                                    @if($item->product->image)
+                                        <img src="{{ asset('storage/ProductsImage/' . $item->product->image) }}"
+                                            class="img-fluid rounded-start" alt="{{ $item->product->name }}"
+                                            style="height:100%; object-fit:cover;">
+                                    @else
+                                        <div class="d-flex align-items-center justify-content-center bg-light" style="height:100%;">
+                                            <i class="fas fa-utensils fa-2x text-secondary"></i>
+                                        </div>
+                                    @endif
                                 </div>
-                            @endif
-                        </div>
-                        <div class="col-6">
-                            <h6>{{ $item->product->name }}</h6>
-                            <small>Số lượng: {{ $item->quantity }}</small>
-                            <br>
-                            <small>Đơn giá: {{ number_format($item->product->price) }} đ</small>
-                        </div>
-                        <div class="col-4 text-end">
-                            <strong>{{ number_format($item->product->price * $item->quantity) }} đ</strong>
-                        </div>
-                    </div>
-                    @endforeach
-                    
-                    <div class="row mt-3">
-                        <div class="col-12 text-end">
-                            <h5>Tổng tiền: <span class="text-danger">{{ number_format($totalAmount) }} đ</span></h5>
+                                <div class="col-8">
+                                    <div class="card-body d-flex flex-column justify-content-between h-100">
+                                        <div>
+                                            <h5 class="card-title">{{ $item->product->name }}</h5>
+                                            <p class="card-text text-danger fw-bold mb-1">
+                                                {{ number_format($item->product->price, 0, '.', '.') }}đ
+                                            </p>
+                                            <p class="card-text">Số lượng: {{ $item->quantity }}</p>
+                                            <p class="card-text fw-bold">Tổng:
+                                                {{ number_format($item->product->price * $item->quantity, 0, '.', '.') }}đ
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endforeach
             </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Thông tin đặt bàn</h5>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('orders.store') }}" method="POST">
-                        @csrf
-                        
-                        <div class="mb-3">
-                            <label for="table_id" class="form-label">Chọn bàn *</label>
-                            <select class="form-select @error('table_id') is-invalid @enderror" 
-                                    id="table_id" name="table_id" required>
-                                <option value="">-- Chọn bàn --</option>
-                                @foreach($availableTables as $table)
-                                <option value="{{ $table->id }}" 
-                                    {{ old('table_id') == $table->id ? 'selected' : '' }}>
-                                    Bàn {{ $table->table_number }} ({{ $table->capacity }} người)
-                                </option>
-                                @endforeach
-                            </select>
-                            @error('table_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <div class="alert alert-info">
-                            <small>
-                                <i class="fas fa-info-circle"></i>
-                                Vui lòng chọn bàn phù hợp với số lượng người trong nhóm của bạn.
-                            </small>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100 btn-lg">
-                            <i class="fas fa-check"></i> Xác nhận đặt món
-                        </button>
-                        
-                        <a href="{{ route('cart.index') }}" class="btn btn-outline-secondary w-100 mt-2">
-                            <i class="fas fa-arrow-left"></i> Quay lại giỏ hàng
-                        </a>
-                    </form>
-                </div>
+
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+                <h4>Tổng cộng: <span class="text-danger">{{ number_format($total, 0, '.', '.') }}đ</span></h4>
+                <button type="submit" class="btn btn-success btn-lg rounded-pill">Thanh toán</button>
             </div>
-        </div>
+        </form>
     </div>
-</div>
+@endsection
+
+@section('styles')
+    <style>
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+    </style>
 @endsection
