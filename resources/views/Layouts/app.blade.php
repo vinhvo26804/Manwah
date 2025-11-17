@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- Thêm dòng này -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Manwah Restaurant</title>
 
@@ -12,31 +13,42 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-          <style>
+
+    <style>
         body {
             background-color: #f8f9fa;
         }
+
         .navbar-brand {
             font-weight: bold;
             color: #d32f2f !important;
         }
+
         .card {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border: none;
             border-radius: 10px;
         }
+
         .btn-primary {
             background-color: #d32f2f;
             border-color: #d32f2f;
         }
+
         .btn-primary:hover {
             background-color: #b71c1c;
             border-color: #b71c1c;
         }
     </style>
-    @yield('scripts');
+
+    @yield('styles')
 </head>
+
 <body>
+    @php
+        $tableId = session('table_id') ?? null;
+    @endphp
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/dashboard') }}">
@@ -51,13 +63,32 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/dashboard') }}">
-                            <i class="fas fa-home me-1"></i>Trang chủ
+                            <i class="fas fa-home me-1"></i>Trang Chủ
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('cart.index') }}">
-                            <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
-                        </a>
+                        @if($tableId)
+                            <a class="nav-link" href="{{ route('table.menu', ['table' => $tableId]) }}">
+                                <i class="fas fa-utensils me-1"></i>Thực Đơn
+                            </a>
+                        @else
+                            <a class="nav-link" href="{{ route('choose.table') }}">
+                                <i class="fas fa-utensils me-1"></i>Thực Đơn
+                            </a>
+                        @endif
+                    </li>
+
+                    <li class="nav-item">
+                        @if($tableId)
+                            <a class="nav-link" href="{{ route('table.cart', ['table' => $tableId]) }}">
+                                <i class="fas fa-shopping-cart me-1"></i>Giỏ Hàng
+                            </a>
+                        @else
+                            <a class="nav-link" href="{{ route('choose.table') }}">
+                                <i class="fas fa-shopping-cart me-1"></i>Chọn bàn / Giỏ Hàng
+                            </a>
+                        @endif
                     </li>
                 </ul>
 
@@ -76,7 +107,7 @@
                     @else
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user me-1"></i>{{ Auth::user()->full_name }}
                                 @if(Auth::user()->isAdmin())
                                     <span class="badge bg-danger ms-1">Admin</span>
@@ -85,21 +116,28 @@
                                 @endif
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{{ route('orders.index') }}">
-                                    <i class="fas fa-list me-2"></i>Đơn hàng của tôi
-                                </a></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('orders.index') }}">
+                                        <i class="fas fa-list me-2"></i>Đơn hàng của tôi
+                                    </a>
+                                </li>
 
                                 @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ route('orders.index') }}">
-                                        <i class="fas fa-cog me-2"></i>Quản lý đơn hàng
-                                    </a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('orders.index') }}">
+                                            <i class="fas fa-cog me-2"></i>Quản lý đơn hàng
+                                        </a>
+                                    </li>
                                 @endif
 
-                                <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                         <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                                     </a>
@@ -140,13 +178,16 @@
 
     <script>
         // Auto hide alerts after 5 seconds
-        setTimeout(function() {
+        setTimeout(function () {
             var alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
+            alerts.forEach(function (alert) {
                 var bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             });
         }, 5000);
     </script>
+
+    @yield('scripts')
 </body>
+
 </html>

@@ -1,84 +1,152 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Product;
 use App\Models\Cart;
 use App\Models\CartItem;
-use Illuminate\Support\Facades\Auth;
+use App\Models\RestaurantTable;
 
 class CartController extends Controller
 {
-    public function add(Request $request, $id)
+    // Hiển thị giao diện chọn bàn
+    public function chooseTable()
     {
-        $product = Product::findOrFail($id);
-        $quantity = intval($request->quantity);
+        $tables = RestaurantTable::all();
+        return view('cart.choose_table', compact('tables'));
+    }
 
-        // Chỉ thêm khi số lượng > 0
-        if ($quantity > 0) {
-            $cart = session('cart', []);
+    // Gán bàn đã chọn vào session
+    // public function setTable(Request $request)
+    // {
+    //     $request->validate(['table_id' => 'required']);
 
-            if (isset($cart[$id])) {
-                $cart[$id]['quantity'] += $quantity;
+    //     $table = RestaurantTable::find($request->table_id);
+
+    //     if (!$table) {
+    //         return back()->with('error', 'Bàn không tồn tại');
+    //     }
+
+    //     // Lưu vào session
+    //     session(['table_id' => $table->id]);
+
+    //     return redirect()->route('table.cart', $table->id)
+    //         ->with('success', 'Đã chọn bàn thành công!');
+    // }
+
+    // Xem giỏ hàng theo bàn
+    public function index($tableId)
+    {
+        $cart = Cart::with('items.product')->where('table_id', $tableId)->first();
+
+        $items = $cart ? $cart->items : collect();
+
+        return view('cart.index', compact('items', 'tableId'));
+    }
+
+    // Thêm món vào giỏ hàng theo bàn
+    // public function add(Request $request, $tableId)
+    // {
+    //     $request->validate([
+    //         'product_id' => 'required',
+    //         'quantity' => 'required|numeric|min:1',
+    //     ]);
+
+    //     $cart = Cart::firstOrCreate(['table_id' => $tableId]);
+
+    //     $item = CartItem::where('cart_id', $cart->id)
+    //         ->where('product_id', $request->product_id)
+    //         ->first();
+
+    //     if ($item) {
+    //         $item->quantity += $request->quantity;
+    //         $item->save();
+    //     } else {
+    //         CartItem::create([
+    //             'cart_id' => $cart->id,
+    //             'product_id' => $request->product_id,
+    //             'quantity' => $request->quantity,
+    //         ]);
+    //     }
+
+    //     return back()->with('success', 'Đã thêm món vào giỏ hàng');
+    // }
+
+    public function add(Request $request, $tableId)
+    {
+        $request->validate([
+            'product_id' => 'required|array',
+            'quantity' => 'required|array',
+            'product_id.*' => 'required|integer',
+            'quantity.*' => 'required|integer|min:0',
+        ]);
+
+        // Tạo giỏ nếu chưa có
+        $cart = Cart::firstOrCreate(['table_id' => $tableId]);
+
+        foreach ($request->product_id as $index => $productId) {
+
+            $qty = $request->quantity[$index];
+
+            // BỎ QUA món có quantity = 0
+            if ($qty <= 0)
+                continue;
+
+            $item = CartItem::where('cart_id', $cart->id)
+                ->where('product_id', $productId)
+                ->first();
+
+            if ($item) {
+                $item->quantity += $qty;
+                $item->save();
             } else {
-                $cart[$id] = [
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => $quantity,
-                    'image' => $product->image,
-                ];
+                CartItem::create([
+                    'cart_id' => $cart->id,
+                    'product_id' => $productId,
+                    'quantity' => $qty,
+                ]);
             }
-
-            session(['cart' => $cart]);
-
-            return redirect()->back()->with('success', "Đã thêm $quantity {$product->name} vào giỏ hàng!");
         }
 
-        return redirect()->back()->with('error', 'Vui lòng chọn số lượng lớn hơn 0 để thêm vào giỏ hàng.');
+        return back()->with('success', 'Đã thêm các món vào giỏ hàng');
     }
 
 
-    public function index()
+
+
+    // Cập nhật số lượng
+    // CartController.php
+    public function update(Request $request, $tableId, $id)
     {
-        $user = Auth::user();
+        $request->validate([
+            'quantity' => 'required|numeric|min:1',
+        ]);
 
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'Vui lòng đăng nhập để xem giỏ hàng.');
-        }
+        $item = CartItem::findOrFail($id);
+        $item->update(['quantity' => $request->quantity]);
 
-        // Lấy hoặc tạo giỏ hàng
-        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
-
-        // Lấy toàn bộ item trong giỏ
-        $items = $cart->items()->with('product')->get();
-
-        return view('cart.index', compact('cart', 'items'));
+        return back()->with('success', 'Đã cập nhật số lượng');
     }
 
-    // Cập nhật số lượng (Ajax)
-    public function update(Request $request, $id)
+
+    // Xóa 1 món
+    public function remove($tableId, $id)
     {
-        $cart = session('cart', []);
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity'] = max(1, intval($request->quantity));
-            session(['cart' => $cart]);
-            $subtotal = $cart[$id]['price'] * $cart[$id]['quantity'];
-            return response()->json(['subtotal' => $subtotal]);
-        }
-        return response()->json(['error' => 'Không tìm thấy sản phẩm'], 404);
+        CartItem::findOrFail($id)->delete();
+        return back()->with('success', 'Đã xóa món');
     }
 
-    // Xóa món (Ajax)
-    public function remove($id)
+
+    // Xóa toàn bộ giỏ hàng theo bàn
+    public function clear($tableId)
     {
-        $cart = session('cart', []);
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            session(['cart' => $cart]);
-            return response()->json(['success' => true]);
+        $cart = Cart::where('table_id', $tableId)->first();
+
+        if ($cart) {
+            $cart->items()->delete();
+            $cart->delete();
         }
-        return response()->json(['error' => 'Không tìm thấy sản phẩm'], 404);
+
+        return back()->with('success', 'Đã xóa toàn bộ giỏ hàng');
     }
-
-
 }

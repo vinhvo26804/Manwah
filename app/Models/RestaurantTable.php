@@ -6,8 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class RestaurantTable extends Model
 {
-    protected $table = 'restaurant_tables'; // tên bảng
-    protected $fillable = ['table_number','capacity','status'];
+    protected $fillable = ['table_number', 'capacity', 'status', 'employee_id'];
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class, 'table_id');
+    }
 
     public function orders()
     {

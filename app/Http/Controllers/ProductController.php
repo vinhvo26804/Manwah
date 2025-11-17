@@ -63,6 +63,14 @@ class ProductController extends Controller
     // =========================
     public function menu(Request $request)
     {
+        // Kiểm tra đã chọn bàn chưa
+        if (!session('table_id')) {
+            return redirect()->route('choose.table')
+                ->with('error', 'Vui lòng chọn bàn trước khi gọi món.');
+        }
+
+        $tableId = session('table_id'); // <-- thêm dòng này
+
         $categories = Category::all();
 
         $query = Product::where('status', 'active');
@@ -73,8 +81,9 @@ class ProductController extends Controller
 
         $products = $query->get();
 
-        return view('menu.index', compact('products', 'categories'));
+        return view('menu.index', compact('products', 'categories', 'tableId')); // <-- truyền tableId
     }
+
 
 
 }
