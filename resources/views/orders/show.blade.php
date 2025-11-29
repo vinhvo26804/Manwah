@@ -20,18 +20,18 @@
                         <div class="col-md-6">
                             <p><strong>Bàn:</strong> 
                                 @if($order->table)
-                                    Bàn {{ $order->table->name }}
+                                     {{ $order->table->table_number }}
                                 @else
                                     <span class="text-muted">N/A</span>
                                 @endif
                             </p>
                             <p><strong>Trạng thái:</strong> 
                                 @if($order->status == 'pending')
-                                    <span class="badge bg-gradient-warning">Chờ xử lý</span>
+                                    <span class="">Chờ xử lý</span>
                                 @elseif($order->status == 'completed')
-                                    <span class="badge bg-gradient-success">Hoàn thành</span>
+                                    <span class="">Hoàn thành</span>
                                 @elseif($order->status == 'cancelled')
-                                    <span class="badge bg-gradient-danger">Đã hủy</span>
+                                    <span class="">Đã hủy</span>
                                 @endif
                             </p>
                         </div>
@@ -95,6 +95,15 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- nút thanh toán -->
+                       @if(($order->payment_status == 'pending' || !$order->payment_status) && $order->status != 'cancelled')
+                       <div class="mt-4 text-end">
+                                            <a href="{{ route('payment.form', ['orderId' => $order->id]) }}" class="btn btn-success mb-1">
+                                                <i class="fas fa-credit-card me-1"></i>Thanh toán
+                                            </a>
+                                            </div>
+                                            @endif
 
                     <!-- Nút hủy đơn hàng -->
                     @if($order->status == 'pending')
