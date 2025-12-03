@@ -7,7 +7,7 @@ use App\Http\Requests\StoreReservationRequest;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-
+use Illuminate\Http\Request;
 class ReservationController extends Controller
 {
     public function create()
@@ -46,15 +46,41 @@ class ReservationController extends Controller
         return view('customer.reservations.success', compact('reservation'));
     }
 
-    public function history()
-    {
-        abort_unless(Auth::check(), 403);
+  public function history(Request $request)
+{
+    abort_unless(Auth::check(), 403);
 
-        $reservations = Reservation::where('user_id', Auth::id())
-            ->orderByDesc('reservation_date')
-            ->orderByDesc('reservation_time')
-            ->get();
+    $query = Reservation::where('user_id', Auth::id());
 
-        return view('customer.reservations.history', compact('reservations'));
+    // Lọc theo mã đơn (id)
+    if ($request->filled('code')) {
+        $code = ltrim($request->input('code'), '#'); // nếu user nhập #123
+        $query->where('id', $code);
     }
+
+    // Lọc theo trạng thái
+    if ($request->filled('status')) {
+        $query->where('status', $request->input('status'));
+    }
+
+    // Lọc theo ngày từ
+    if ($request->filled('date_from')) {
+        $query->whereDate('reservation_date', '>=', $request->input('date_from'));
+    }
+
+    // Lọc theo ngày đến
+    if ($request->filled('date_to')) {
+        $query->whereDate('reservation_date', '<=', $request->input('date_to'));
+    }
+
+    $reservations = $query
+        ->orderByDesc('reservation_date')
+        ->orderByDesc('reservation_time')
+        ->get();
+
+    // Trả thêm filters để view hiển thị lại giá trị đang chọn
+    $filters = $request->only(['code', 'status', 'date_from', 'date_to']);
+
+    return view('customer.reservations.history', compact('reservations', 'filters'));
+}
 }

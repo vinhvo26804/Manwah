@@ -133,41 +133,83 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">Đặt bàn thành công</h4>
+            <div class="card shadow ticket-card">
+                <div class="card-header bg-success text-white ticket-header">
+                    <div class="icon-circle">
+                        <span class="success-icon">
+                            ✓
+                        </span>
+                    </div>
+                    <h4 class="mb-0 main-title">Đặt bàn thành công</h4>
+                    <p class="mb-0">Cảm ơn bạn đã đặt bàn tại nhà hàng Manwah.</p>
                 </div>
-                <div class="card-body">
-                    <p>Cảm ơn bạn đã đặt bàn tại nhà hàng Manwah.</p>
 
-                    <h5 class="mt-4">Thông tin đặt bàn</h5>
+                <div class="card-body ticket-body">
+                    <h5 class="mt-2 mb-3">Thông tin đặt bàn</h5>
+
                     <ul class="list-group mb-3">
-                        <li class="list-group-item">
-                            <strong>Mã đơn:</strong> #{{ $reservation->id }}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Mã đơn:</span>
+                            <span class="detail-value">#{{ $reservation->id }}</span>
                         </li>
-                        <li class="list-group-item">
-                            <strong>Khách hàng:</strong> {{ $reservation->user->full_name ?? 'Khách hàng' }}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Khách hàng:</span>
+                            {{-- LUÔN dùng customer_name, không phụ thuộc user --}}
+                            <span class="detail-value">{{ $reservation->customer_name }}</span>
                         </li>
-                        <li class="list-group-item">
-                            <strong>Ngày:</strong> {{ $reservation->reservation_date }}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Số điện thoại:</span>
+                            <span class="detail-value">{{ $reservation->customer_phone }}</span>
                         </li>
-                        <li class="list-group-item">
-                            <strong>Giờ:</strong> {{ $reservation->reservation_time }}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Ngày:</span>
+                            <span class="detail-value">{{ $reservation->reservation_date }}</span>
                         </li>
-                        <li class="list-group-item">
-                            <strong>Số khách:</strong> {{ $reservation->guest_count }}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Giờ:</span>
+                            <span class="detail-value time-highlight">{{ $reservation->reservation_time }}</span>
                         </li>
-                        <li class="list-group-item">
-                            <strong>Trạng thái:</strong> {{ ucfirst($reservation->status) }}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Số khách:</span>
+                            <span class="detail-value">{{ $reservation->guest_count }}</span>
                         </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Trạng thái:</span>
+                            <span class="detail-value">{{ ucfirst($reservation->status) }}</span>
+                        </li>
+
+                        {{-- Nếu có gắn bàn cụ thể --}}
+                        @if ($reservation->restaurantTable)
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Bàn:</span>
+                            <span class="detail-value">{{ $reservation->restaurantTable->name }}</span>
+                        </li>
+                        @endif
+
+                        {{-- Thông tin tài khoản (nếu có đăng nhập) --}}
+                        @if ($reservation->user)
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="detail-label">Tài khoản:</span>
+                            <span class="detail-value">
+                                {{ $reservation->user->full_name ?? $reservation->user->name }}
+                                ({{ $reservation->user->email }})
+                            </span>
+                        </li>
+                        @endif
                     </ul>
 
-                    <a href="{{ url('/') }}" class="btn btn-outline-secondary">
-                        Về trang chủ
-                    </a>
-                    <a href="{{ route('reservations.history') }}" class="btn btn-primary">
-                        Xem lịch sử đặt bàn
-                    </a>
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{{ url('/') }}" class="btn btn-outline-secondary">
+                            Về trang chủ
+                        </a>
+
+                        {{-- Chỉ show lịch sử nếu có user (đăng nhập) --}}
+                        @if ($reservation->user)
+                            <a href="{{ route('reservations.history') }}" class="btn btn-primary">
+                                Xem lịch sử đặt bàn
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
