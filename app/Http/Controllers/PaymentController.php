@@ -38,9 +38,9 @@ class PaymentController extends Controller
         try {
             // Lấy thông tin đơn hàng với các relationship
             $order = Order::with(['items', 'user', 'table'])->findOrFail($orderId);
-            
+
             return view('payment.form', compact('order'));
-            
+
         } catch (\Exception $e) {
             Log::error('Error loading order: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Không tìm thấy đơn hàng');
@@ -55,9 +55,9 @@ class PaymentController extends Controller
         try {
             // Lấy thông tin đơn hàng thực tế
             $order = Order::with(['user'])->findOrFail($orderId);
-            
+
             $paymentMethod = $request->input('payment_method');
-            
+
             switch ($paymentMethod) {
                 case 'momo':
                     return $this->processMoMoPayment($order);
@@ -70,7 +70,7 @@ class PaymentController extends Controller
                 default:
                     return redirect()->back()->with('error', 'Phương thức thanh toán không hợp lệ');
             }
-            
+
         } catch (\Exception $e) {
             Log::error('Process payment error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Lỗi xử lý thanh toán: ' . $e->getMessage());
@@ -80,91 +80,98 @@ class PaymentController extends Controller
     /**
      * Xử lý thanh toán MoMo
      */
-  
-private function processMoMoPayment($order)
-{
-    try {
-        // Ép amount thành int để tránh lỗi định dạng
-        $amount = (int) $order->display_total;
-        $requestId = (string) Str::uuid();
-        $momoOrderId = 'ORDER_' . $order->id . '_' . time();
-        
-        // Lấy tên khách hàng từ user relationship
-        $customerName = $order->user ? $order->user->name : 'Khách hàng';
-        
-        // URL encode orderInfo để tránh ký tự đặc biệt
-        $orderInfo = urlencode("Payment for order " . $order->id);
-        Log::info('=== INITIATING MOMO PAYMENT ===');
-        Log::info('Order Details:', [
-            'order_id' => $order->id,
-            'customer' => $customerName,
-            'amount' => $amount,
-            'table_id' => $order->table_id,
-            'momo_order_id' => $momoOrderId
-        ]);
-        // TẠO rawHash THEO CHUẨN MOMO (Thứ tự chính xác)
-        $rawHash = "accessKey=" . $this->accessKey .
-            "&amount=" . $amount .
-            "&extraData=" .  // Chuỗi rỗng
-            "&ipnUrl=" . $this->notifyUrl .
-            "&orderId=" . $momoOrderId .
-            "&orderInfo=" . $orderInfo .
-            "&partnerCode=" . $this->partnerCode .
-            "&redirectUrl=" . $this->returnUrl .
-            "&requestId=" . $requestId .
-            "&requestType=captureWallet";
-        Log::info('Raw Hash for Signature:', ['rawHash' => $rawHash]);
-        $signature = hash_hmac('sha256', $rawHash, $this->secretKey);
-        Log::info('Generated Signature:', ['signature' => $signature]);
-        $payload = [
-            'partnerCode' => $this->partnerCode,
-            'requestId' => $requestId,
-            'amount' => $amount,
-            'orderId' => $momoOrderId,
-            'orderInfo' => $orderInfo,  // Đã encode
-            'redirectUrl' => $this->returnUrl,
-            'ipnUrl' => $this->notifyUrl,
-            'lang' => 'vi',
-            'extraData' => '',
-            'requestType' => 'captureWallet',
-            'signature' => $signature
-        ];
-        Log::info('MoMo Request Payload:', $payload);
-        $response = Http::timeout(30)
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-            ])
-            ->post($this->endpoint, $payload);
-        if (!$response->successful()) {
-            $errorBody = $response->body();
-            Log::error('MoMo API Error:', [
-                'status' => $response->status(),
-                'response' => $errorBody
-            ]);
-            throw new \Exception("MoMo API lỗi: " . $errorBody);
-        }
-        $result = $response->json();
-        Log::info('MoMo API Response:', $result);
-        if (isset($result['resultCode']) && $result['resultCode'] == 0) {
-                     $order->update([
-                'status' => 'pending',
-                'momo_request_id' => $requestId
-            ]); 
-            Log::info('Redirecting to MoMo:', ['payUrl' => $result['payUrl']]);
-            // return redirect()->away($result['payUrl']); chuyển hướng đến trang tạo mã QR của momo
-            return redirect()->route('payment.momo.form', $order->id);
 
-        } else {
-            $errorMsg = $result['message'] ?? 'Unknown error';
-            $errorCode = $result['resultCode'] ?? 'N/A';
-            throw new \Exception("{$errorMsg} (Mã: {$errorCode})");
+    private function processMoMoPayment($order)
+    {
+        try {
+            // Ép amount thành int để tránh lỗi định dạng
+            $amount = (int) $order->display_total;
+            $requestId = (string) Str::uuid();
+            $momoOrderId = 'ORDER_' . $order->id . '_' . time();
+
+            // Lấy tên khách hàng từ user relationship
+            $customerName = $order->user ? $order->user->name : 'Khách hàng';
+
+            // URL encode orderInfo để tránh ký tự đặc biệt
+            $orderInfo = urlencode("Payment for order " . $order->id);
+            Log::info('=== INITIATING MOMO PAYMENT ===');
+            Log::info('Order Details:', [
+                'order_id' => $order->id,
+                'customer' => $customerName,
+                'amount' => $amount,
+                'table_id' => $order->table_id,
+                'momo_order_id' => $momoOrderId
+            ]);
+            // TẠO rawHash THEO CHUẨN MOMO (Thứ tự chính xác)
+            $rawHash = "accessKey=" . $this->accessKey .
+                "&amount=" . $amount .
+                "&extraData=" .  // Chuỗi rỗng
+                "&ipnUrl=" . $this->notifyUrl .
+                "&orderId=" . $momoOrderId .
+                "&orderInfo=" . $orderInfo .
+                "&partnerCode=" . $this->partnerCode .
+                "&redirectUrl=" . $this->returnUrl .
+                "&requestId=" . $requestId .
+                "&requestType=captureWallet";
+                // "&autoCapture=true";  // Thêm cho v3
+            Log::info('Raw Hash for Signature:', ['rawHash' => $rawHash]);
+            $signature = hash_hmac('sha256', $rawHash, $this->secretKey);
+            Log::info('Generated Signature:', ['signature' => $signature]);
+            $payload = [
+                'partnerCode' => $this->partnerCode,
+                'requestId' => $requestId,
+                'amount' => $amount,
+                'orderId' => $momoOrderId,
+                'orderInfo' => $orderInfo,  // Đã encode
+                'redirectUrl' => $this->returnUrl,
+                'ipnUrl' => $this->notifyUrl,
+                'lang' => 'vi',
+                'extraData' => '',
+                'requestType' => 'captureWallet',
+                // 'autoCapture' => true,  // Thêm cho v3
+                'signature' => $signature
+            ];
+            Log::info('MoMo Request Payload:', $payload);
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                ])
+                ->post($this->endpoint, $payload);
+            if (!$response->successful()) {
+                $errorBody = $response->body();
+                Log::error('MoMo API Error:', [
+                    'status' => $response->status(),
+                    'response' => $errorBody
+                ]);
+                throw new \Exception("MoMo API lỗi: " . $errorBody);
+            }
+            $result = $response->json();
+            Log::info('MoMo API Response:', $result);
+            if (isset($result['resultCode']) && $result['resultCode'] == 0) {
+                $order->update([
+                    'status' => 'pending',
+                    'momo_request_id' => $requestId
+                ]);
+
+                if ($order->table) {
+                    $order->table->update(['status' => 'available']);
+                }
+
+                Log::info('Redirecting to MoMo:', ['payUrl' => $result['payUrl']]);
+                // return redirect()->away($result['payUrl']); chuyển hướng đến trang tạo mã QR của momo
+                return redirect()->route('payment.momo.form', $order->id);
+
+            } else {
+                $errorMsg = $result['message'] ?? 'Unknown error';
+                $errorCode = $result['resultCode'] ?? 'N/A';
+                throw new \Exception("{$errorMsg} (Mã: {$errorCode})");
+            }
+        } catch (\Exception $e) {
+            Log::error('MoMo Payment Exception: ' . $e->getMessage());
+            return redirect()->route('payment.form', $order->id)
+                ->with('error', 'Lỗi thanh toán MoMo: ' . $e->getMessage());
         }
-    } catch (\Exception $e) {
-        Log::error('MoMo Payment Exception: ' . $e->getMessage());
-        return redirect()->route('payment.form', $order->id)
-            ->with('error', 'Lỗi thanh toán MoMo: ' . $e->getMessage());
     }
-}
 
 
     /**
@@ -173,9 +180,15 @@ private function processMoMoPayment($order)
     private function processCashPayment($order)
     {
         $order->update([
-            'status' => 'completed' // Hoặc trạng thái phù hợp với hệ thống của bạn
+            'status' => 'completed',
+            'payment_method' => 'cash' // Hoặc trạng thái phù hợp với hệ thống của bạn
         ]);
-        
+
+        // CẬP NHẬT STATUS BÀN
+        if ($order->table) {
+            $order->table->update(['status' => 'available']);
+        }
+
         return redirect()->route('payment.form', $order->id)
             ->with('success', 'Đã xác nhận thanh toán tiền mặt. Vui lòng thanh toán khi nhận hàng.');
     }
@@ -188,7 +201,7 @@ private function processMoMoPayment($order)
         $order->update([
             'status' => 'pending_bank_transfer'
         ]);
-        
+
         return redirect()->route('payment.form', $order->id)
             ->with('info', 'Vui lòng chuyển khoản theo thông tin ngân hàng được cung cấp.');
     }
@@ -210,10 +223,10 @@ private function processMoMoPayment($order)
         $params = $request->all();
         Log::info('=== MOMO CALLBACK RECEIVED ===', $params);
 
-                try {
+        try {
             // Kiểm tra signature callback
             $isValid = $this->verifyCallbackSignature($params);
-            
+
             if (!$isValid) {
                 Log::warning('Invalid callback signature');
                 return view('payment.error', ['message' => 'Invalid signature']);
@@ -222,7 +235,7 @@ private function processMoMoPayment($order)
             // Extract order ID
             $momoOrderId = $params['orderId'];
             $orderId = explode('_', $momoOrderId)[1];
-            
+
             $order = Order::with(['user'])->findOrFail($orderId);
             $customerName = $order->user ? $order->user->name : 'Khách hàng';
 
@@ -233,6 +246,11 @@ private function processMoMoPayment($order)
                     'transaction_id' => $params['transId'],
                     'payment_method' => 'momo'
                 ]);
+
+                // CẬP NHẬT STATUS BÀN
+                if ($order->table) {
+                    $order->table->update(['status' => 'available']);
+                }
 
                 return view('payment.success', [
                     'orderId' => $orderId,
@@ -253,7 +271,7 @@ private function processMoMoPayment($order)
                     'customerName' => $customerName
                 ]);
             }
-            
+
         } catch (\Exception $e) {
             Log::error('Callback processing error: ' . $e->getMessage());
             return view('payment.error', ['message' => 'Lỗi xử lý: ' . $e->getMessage()]);
@@ -262,31 +280,31 @@ private function processMoMoPayment($order)
     /**
      * Verify callback signature - THEO CHUẨN MOMO
      */
-  private function verifyCallbackSignature($params)
-{
-    if (!isset($params['signature'])) {
-        return false;
+    private function verifyCallbackSignature($params)
+    {
+        if (!isset($params['signature'])) {
+            return false;
+        }
+        $responseSignature = $params['signature'];
+
+        // Thứ tự CHÍNH XÁC cho callback/IPN (bao gồm orderType và payType)
+        $rawHash = "accessKey=" . $this->accessKey .
+            "&amount=" . $params['amount'] .
+            "&extraData=" . $params['extraData'] .
+            "&message=" . $params['message'] .
+            "&orderId=" . $params['orderId'] .
+            "&orderInfo=" . $params['orderInfo'] .
+            "&orderType=" . ($params['orderType'] ?? '') .  // Thêm nếu thiếu
+            "&partnerCode=" . $params['partnerCode'] .
+            "&payType=" . ($params['payType'] ?? '') .      // Thêm nếu thiếu
+            "&requestId=" . $params['requestId'] .
+            "&responseTime=" . $params['responseTime'] .
+            "&resultCode=" . $params['resultCode'] .
+            "&transId=" . $params['transId'];
+        $calculatedSignature = hash_hmac('sha256', $rawHash, $this->secretKey);
+        return hash_equals($calculatedSignature, $responseSignature);
     }
-    $responseSignature = $params['signature'];
-    
-    // Thứ tự CHÍNH XÁC cho callback/IPN (bao gồm orderType và payType)
-    $rawHash = "accessKey=" . $this->accessKey .
-        "&amount=" . $params['amount'] .
-        "&extraData=" . $params['extraData'] .
-        "&message=" . $params['message'] .
-        "&orderId=" . $params['orderId'] .
-        "&orderInfo=" . $params['orderInfo'] .
-        "&orderType=" . ($params['orderType'] ?? '') .  // Thêm nếu thiếu
-        "&partnerCode=" . $params['partnerCode'] .
-        "&payType=" . ($params['payType'] ?? '') .      // Thêm nếu thiếu
-        "&requestId=" . $params['requestId'] .
-        "&responseTime=" . $params['responseTime'] .
-        "&resultCode=" . $params['resultCode'] .
-        "&transId=" . $params['transId'];
-    $calculatedSignature = hash_hmac('sha256', $rawHash, $this->secretKey);
-    return hash_equals($calculatedSignature, $responseSignature);
-}
-      /**
+    /**
      * IPN Handler - THEO CHUẨN MOMO
      */
     public function momoIPN(Request $request)
@@ -303,7 +321,7 @@ private function processMoMoPayment($order)
 
             $momoOrderId = $params['orderId'];
             $orderId = explode('_', $momoOrderId)[1];
-            
+
             $order = Order::findOrFail($orderId);
 
             if ($params['resultCode'] == 0) {
@@ -312,6 +330,11 @@ private function processMoMoPayment($order)
                     'transaction_id' => $params['transId'],
                     'payment_method' => 'momo'
                 ]);
+                // CẬP NHẬT STATUS BÀN
+                if ($order->table) {
+                    $order->table->update(['status' => 'available']);
+                }
+
                 Log::info("IPN: Order {$orderId} paid successfully");
             } else {
                 $order->update([
@@ -321,7 +344,7 @@ private function processMoMoPayment($order)
             }
 
             return response()->json(['status' => 'success'], 200);
-            
+
         } catch (\Exception $e) {
             Log::error('IPN processing error: ' . $e->getMessage());
             return response()->json(['error' => 'Processing failed'], 500);
@@ -379,7 +402,7 @@ private function processMoMoPayment($order)
         }
     }
 
-    
+
     /**
      * Kiểm tra trạng thái thanh toán
      */
@@ -389,7 +412,7 @@ private function processMoMoPayment($order)
             $order = Order::with(['user', 'table'])->findOrFail($orderId);
             $customerName = $order->user ? $order->user->name : 'Khách hàng';
             $tableName = $order->table ? $order->table->name : 'N/A';
-            
+
             return response()->json([
                 'order_id' => $orderId,
                 'status' => $order->status,
@@ -399,7 +422,7 @@ private function processMoMoPayment($order)
                 'table_name' => $tableName,
                 'transaction_id' => $order->transaction_id
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Order not found',
@@ -418,7 +441,7 @@ private function processMoMoPayment($order)
         }
 
         $responseSignature = $params['signature'];
-        
+
         $rawHash = "accessKey={$this->accessKey}" .
             "&amount={$params['amount']}" .
             "&extraData={$params['extraData']}" .
@@ -438,61 +461,61 @@ private function processMoMoPayment($order)
         return hash_equals($calculatedSignature, $responseSignature);
     }
     /**
- * Hiển thị form nhập thông tin thẻ MoMo (giả lập cho test)
- */
-public function showMoMoForm($orderId)
-{
-    try {
-        $order = Order::with(['items', 'user', 'table'])->findOrFail($orderId);
-        return view('payment.momo_form', compact('order')); 
-    } catch (\Exception $e) {
-        Log::error('Error loading MoMo form: ' . $e->getMessage());
-        return redirect()->back()->with('error', 'Không tìm thấy đơn hàng');
-    }
-}
-
-/**
- * Giả lập thanh toán MoMo thành công (chỉ cho test)
- */
-public function simulateMoMoPayment(Request $request, $orderId)
-{
-    try {
-        $order = Order::findOrFail($orderId);
-        
-        // Validate thông tin thẻ (tùy chọn, để giả lập)
-        $request->validate([
-            'card_number' => 'required|string',
-            'card_holder' => 'required|string',
-            'expiry' => 'required|string',
-            'cvv' => 'required|string',
-        ]);
-        
-        // Giả lập: Nếu thông tin khớp với test data, thành công
-        $testCard = '9704000000000018';
-        $testHolder = 'NGUYEN VAN A';
-        if ($request->card_number === $testCard && $request->card_holder === $testHolder) {
-            // Cập nhật order như thanh toán thành công
-            $order->update([
-                'status' => 'completed',
-                'payment_method' => 'momo',
-                'transaction_id' => 'SIMULATED_' . time(), // ID giả
-            ]);
-            
-            Log::info("Simulated MoMo payment success for order {$orderId}");
-            return redirect()->route('payment.success', $orderId)->with('success', 'Thanh toán MoMo thành công (giả lập)!');
-        } else {
-            return back()->with('error', 'Thông tin thẻ không hợp lệ. Sử dụng thông tin test từ docs MoMo.');
+     * Hiển thị form nhập thông tin thẻ MoMo (giả lập cho test)
+     */
+    public function showMoMoForm($orderId)
+    {
+        try {
+            $order = Order::with(['items', 'user', 'table'])->findOrFail($orderId);
+            return view('payment.momo_form', compact('order'));
+        } catch (\Exception $e) {
+            Log::error('Error loading MoMo form: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Không tìm thấy đơn hàng');
         }
-        
-    } catch (\Exception $e) {
-        Log::error('Simulate MoMo payment error: ' . $e->getMessage());
-        return back()->with('error', 'Lỗi giả lập thanh toán: ' . $e->getMessage());
     }
-}
-public function showSuccess($orderId)
-{
-    $order = Order::findOrFail($orderId);
-    return view('payment.success', compact('order'));
-}
+
+    /**
+     * Giả lập thanh toán MoMo thành công (chỉ cho test)
+     */
+    public function simulateMoMoPayment(Request $request, $orderId)
+    {
+        try {
+            $order = Order::findOrFail($orderId);
+
+            // Validate thông tin thẻ (tùy chọn, để giả lập)
+            $request->validate([
+                'card_number' => 'required|string',
+                'card_holder' => 'required|string',
+                'expiry' => 'required|string',
+                'cvv' => 'required|string',
+            ]);
+
+            // Giả lập: Nếu thông tin khớp với test data, thành công
+            $testCard = '9704000000000018';
+            $testHolder = 'NGUYEN VAN A';
+            if ($request->card_number === $testCard && $request->card_holder === $testHolder) {
+                // Cập nhật order như thanh toán thành công
+                $order->update([
+                    'status' => 'completed',
+                    'payment_method' => 'momo',
+                    'transaction_id' => 'SIMULATED_' . time(), // ID giả
+                ]);
+
+                Log::info("Simulated MoMo payment success for order {$orderId}");
+                return redirect()->route('payment.success', $orderId)->with('success', 'Thanh toán MoMo thành công (giả lập)!');
+            } else {
+                return back()->with('error', 'Thông tin thẻ không hợp lệ. Sử dụng thông tin test từ docs MoMo.');
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Simulate MoMo payment error: ' . $e->getMessage());
+            return back()->with('error', 'Lỗi giả lập thanh toán: ' . $e->getMessage());
+        }
+    }
+    public function showSuccess($orderId)
+    {
+        $order = Order::findOrFail($orderId);
+        return view('payment.success', compact('order'));
+    }
 
 }
