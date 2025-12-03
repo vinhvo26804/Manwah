@@ -19,7 +19,12 @@
                 </li>
                 <li class="nav-item mb-2">
                     <a href="{{ route('products.index') }}" class="nav-link text-white {{ request()->is('products*') ? 'active fw-bold' : '' }}">
-                        📦 Quản lý Products
+                         📦 Quản lý Products
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a href="{{ route('report.index') }}" class="nav-link text-white {{ request()->is('products*') ? 'active fw-bold' : '' }}">
+                       📊 Report
                     </a>
                 </li>
             </ul>
