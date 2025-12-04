@@ -177,13 +177,25 @@
                                         <i class="fas fa-user"></i>
                                     </div>
                                     <div>
+                                        {{-- ✅ Luôn dùng tên người đặt từ reservation --}}
                                         <div class="customer-name">
-                                            {{ $reservation->user->full_name ?? 'Khách lẻ' }}
+                                            {{ $reservation->customer_name ?? 'Khách lẻ' }}
                                         </div>
                                         <div class="customer-sub">
+                                            {{-- Số điện thoại người đặt --}}
                                             <i class="fas fa-phone me-1"></i>
-                                            {{ $reservation->user->phone ?? 'N/A' }}
+                                            {{ $reservation->customer_phone ?? 'N/A' }}
                                         </div>
+
+                                        {{-- Nếu có gắn với tài khoản user, hiển thị thêm 1 dòng nhỏ --}}
+                                        @if ($reservation->user)
+                                            <div class="customer-sub">
+                                                <i class="far fa-user-circle me-1"></i>
+                                                Tài khoản:
+                                                {{ $reservation->user->full_name ?? $reservation->user->name }}
+                                                ({{ $reservation->user->email }})
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </td>

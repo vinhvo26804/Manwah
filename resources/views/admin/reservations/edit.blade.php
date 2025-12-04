@@ -200,12 +200,14 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div>
+                    {{-- ✅ Luôn hiện đúng tên người đặt từ reservation --}}
                     <div class="info-line-main">
-                        {{ $reservation->user->full_name ?? 'Khách lẻ' }}
+                        {{ $reservation->customer_name ?? 'Khách lẻ' }}
                     </div>
                     <div class="info-line-sub">
+                        {{-- Số điện thoại người đặt --}}
                         <i class="fas fa-phone me-1"></i>
-                        {{ $reservation->user->phone ?? 'N/A' }}
+                        {{ $reservation->customer_phone ?? 'N/A' }}
                         &nbsp; • &nbsp;
                         <i class="far fa-calendar-alt me-1"></i>
                         {{ \Carbon\Carbon::parse($reservation->reservation_date)->format('d/m/Y') }}
@@ -216,6 +218,16 @@
                         <i class="fas fa-users me-1"></i>
                         {{ $reservation->guest_count }} khách
                     </div>
+
+                    {{-- Nếu có gắn với tài khoản user, hiển thị thêm 1 dòng nhỏ bên dưới --}}
+                    @if ($reservation->user)
+                        <div class="info-line-sub mt-1">
+                            <i class="far fa-user-circle me-1"></i>
+                            Tài khoản:
+                            {{ $reservation->user->full_name ?? $reservation->user->name }}
+                            ({{ $reservation->user->email }})
+                        </div>
+                    @endif
                 </div>
             </div>
 
