@@ -112,7 +112,7 @@
                                     <td class="align-middle">
                                         <div class="btn-group-vertical btn-group-sm">
                                             <!-- Nút Xem chi tiết -->
-                                            <a href="{{ route('orders.shaow', $order->id) }}" class="btn btn-info mb-1">
+                                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-info mb-1">
                                                 <i class="fas fa-eye me-1"></i>Chi tiết
                                             </a>
                                             
