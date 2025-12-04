@@ -111,8 +111,7 @@ class TableController extends Controller
     public function edit($id)
     {
         $table = RestaurantTable::findOrFail($id);
-        $employees = User::whereIn('role', ['admin', 'staff'])->get();
-
+        $employees = User::where('role', 'staff')->get();
 
         return view('tables.edit', compact('table', 'employees'));
     }

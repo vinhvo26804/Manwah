@@ -51,7 +51,7 @@ class OrderController extends Controller
         return view('orders.create', compact('cart', 'tableId'));
     }
 
-    // GỬI VÀO BẾP
+    // ⭐ GỬI VÀO BẾP - LOGIC CHÍNH (Dim Sum Flow)
     public function store(Request $request, $tableId)
     {
         $cart = Cart::with('items.product')->where('table_id', $tableId)->first();
@@ -61,13 +61,13 @@ class OrderController extends Controller
                 ->with('error', 'Giỏ hàng đang trống');
         }
 
-        //KIỂM TRA BÀN NÀY ĐÃ CÓ ORDER ĐANG HOẠT ĐỘNG CHƯA?
+        // ⭐ KIỂM TRA BÀN NÀY ĐÃ CÓ ORDER ĐANG HOẠT ĐỘNG CHƯA?
         $existingOrder = Order::where('table_id', $tableId)
             ->whereIn('status', ['confirmed', 'active'])
             ->first();
 
         if ($existingOrder) {
-            // ĐÃ CÓ ORDER → THÊM VÀO ORDER CŨ (BATCH MỚI)
+            // ⭐ ĐÃ CÓ ORDER → THÊM VÀO ORDER CŨ (BATCH MỚI)
 
             // Tìm batch_number lớn nhất hiện tại
             $maxBatch = OrderItem::where('order_id', $existingOrder->id)
@@ -98,7 +98,7 @@ class OrderController extends Controller
             $existingOrder->updated_at = now();
             $existingOrder->save();
 
-            //  XÓA GIỎ HÀNG - QUAN TRỌNG
+            // ⭐ XÓA GIỎ HÀNG - QUAN TRỌNG
             try {
                 $cart->items()->delete();
                 $cart->delete();
@@ -107,10 +107,10 @@ class OrderController extends Controller
             }
 
             return redirect()->route('orders.show', $existingOrder->id)
-                ->with('success', "Đã gọi thêm {$itemCount} món (Đợt {$newBatchNumber})! Tổng order: " . number_format($existingOrder->total_amount) . 'đ');
+                ->with('success', "✅ Đã gọi thêm {$itemCount} món (Đợt {$newBatchNumber})! Tổng order: " . number_format($existingOrder->total_amount) . 'đ');
 
         } else {
-            // CHƯA CÓ ORDER → TẠO ORDER MỚI (BATCH 1)
+            // ⭐ CHƯA CÓ ORDER → TẠO ORDER MỚI (BATCH 1)
 
             $totalAmount = 0;
             foreach ($cart->items as $item) {
@@ -142,7 +142,7 @@ class OrderController extends Controller
                 }
             }
 
-            // XÓA GIỎ HÀNG - QUAN TRỌNG
+            // ⭐ XÓA GIỎ HÀNG - QUAN TRỌNG
             try {
                 $cart->items()->delete();
                 $cart->delete();
@@ -154,7 +154,7 @@ class OrderController extends Controller
             RestaurantTable::where('id', $tableId)->update(['status' => 'occupied']);
 
             return redirect()->route('orders.show', $order->id)
-                ->with('success', "Đã gửi {$itemCount} món vào bếp! Tổng: " . number_format($totalAmount) . 'đ');
+                ->with('success', "✅ Đã gửi {$itemCount} món vào bếp! Tổng: " . number_format($totalAmount) . 'đ');
         }
     }
 
@@ -175,7 +175,7 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
-    // ĐÁNH DẤU HOÀN THÀNH (ĂN XONG, CHUẨN BỊ THANH TOÁN)
+    // ⭐ ĐÁNH DẤU HOÀN THÀNH (ĂN XONG, CHUẨN BỊ THANH TOÁN)
     public function markAsCompleted($id)
     {
         $order = Order::findOrFail($id);
@@ -184,9 +184,9 @@ class OrderController extends Controller
             return back()->with('error', 'Chỉ nhân viên mới có thể đánh dấu hoàn thành');
         }
 
-        $order->update(['status' => 'served']);
+        $order->update(['status' => 'completed']);
 
-        return back()->with('success', 'Đã đánh dấu hoàn thành! Khách có thể thanh toán.');
+        return back()->with('success', '✅ Đã đánh dấu hoàn thành! Khách có thể thanh toán.');
     }
 
     // HỦY ĐƠN HÀNG (CHỈ ADMIN/STAFF)
