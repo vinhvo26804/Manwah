@@ -1,13 +1,8 @@
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Manwah — Taiwanese Hotpot</title>
+@extends('Layouts.app')
+
+@section('styles')
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <!-- Bootstrap for quick layout (optional) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
     .hero{
@@ -27,8 +22,9 @@
     footer{background:#0b0b0b;color:#ddd;padding:30px 0}
     .btn-primary{background:#d43c3c;border:0}
   </style>
-</head>
-<body>
+@endsection
+
+@section('content')
   <!-- Header -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
@@ -43,7 +39,6 @@
           <li class="nav-item"><a class="nav-link" href="#menu">Thực đơn</a></li>
           <li class="nav-item"><a class="nav-link" href="#gallery">Gallery</a></li>
           <li class="nav-item"><a class="nav-link" href="#contact">Liên hệ</a></li>
-          <li class="nav-item ms-3"><a class="btn btn-outline-primary" href="{{ route('login') }}">Đăng nhập</a></li>
         </ul>
       </div>
     </div>
@@ -158,28 +153,14 @@
           <!-- simple booking form (public) -->
           <div class="card p-3">
             <h5>Đặt bàn nhanh</h5>
-           <form action="{{ route('reservations.store') }}" method="POST">
-    @csrf
-
-    <div class="mb-2">
-        <input class="form-control" name="customer_name" placeholder="Họ tên" required>
-    </div>
-
-    <div class="mb-2">
-        <input class="form-control" name="customer_phone" placeholder="Số điện thoại" required>
-    </div>
-
-    <div class="mb-2">
-        <input class="form-control" name="reservation_time" type="datetime-local" required>
-    </div>
-
-    <div class="mb-2">
-        <input class="form-control" name="num_guests" type="number" min="1" required>
-    </div>
-
-    <button class="btn btn-primary w-100">Gửi yêu cầu</button>
-</form>
-
+            <form action="" method="POST">
+              @csrf
+              <div class="mb-2"><input class="form-control" name="name" placeholder="Họ tên" required></div>
+              <div class="mb-2"><input class="form-control" name="phone" placeholder="Số điện thoại" required></div>
+              <div class="mb-2"><input class="form-control" name="date" type="date" required></div>
+              <div class="mb-2"><select class="form-control" name="people"><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
+              <button class="btn btn-primary w-100">Gửi yêu cầu</button>
+            </form>
             <small class="text-muted d-block mt-2">Lưu ý: khách không cần đăng nhập để gửi yêu cầu đặt bàn.</small>
           </div>
         </div>
@@ -194,7 +175,4 @@
       <p class="small mb-0">Xem thêm trên <a href="{{ url('/') }}" class="text-decoration-underline text-white">Trang chính</a></p>
     </div>
   </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

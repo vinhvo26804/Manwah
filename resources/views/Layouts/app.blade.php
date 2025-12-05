@@ -90,6 +90,16 @@
                             </a>
                         @endif
                     </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('reservations.create') }}">
+                               <i class="fa-solid fa-utensils"></i> Đặt bàn ngay
+                            </a>
+                        </li>
+                               <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.reservations.index') }}">
+                               <i class="fa-solid fa-utensils"></i> quản lý đặt bàn
+                            </a>
+                        </li>
                 </ul>
 
                 <ul class="navbar-nav">
@@ -122,6 +132,12 @@
                                     </a>
                                 </li>
 
+                                 <li>
+                                    <a class="dropdown-item" href="{{ route('reservations.history') }}">
+                                        <i class="fas fa-list me-2"></i>Lịch sử đặt bàn
+                                    </a>
+                                </li>
+
                                 @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                     <li>
                                         <hr class="dropdown-divider">
@@ -131,11 +147,6 @@
                                             <i class="fas fa-cog me-2"></i>Quản lý đơn hàng
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('tables.index') }}">
-                                            <i class="fas fa-chair me-2"></i>Quản lý bàn
-                                        </a>
-                                    </li>
                                 @endif
 
                                 <li>
@@ -143,7 +154,7 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                         document.getElementById('logout-form').submit();">
+                                                     document.getElementById('logout-form').submit();">
                                         <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                                     </a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
