@@ -150,9 +150,9 @@
                 </div>
 
                 <!-- <div class="alert alert-info mt-3">
-                                            <i class="fas fa-info-circle me-2"></i>
-                                            <strong>Lưu ý:</strong> Bạn có thể tiếp tục gọi thêm món. Các món mới sẽ được thêm vào đơn hàng này.
-                                        </div> -->
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <strong>Lưu ý:</strong> Bạn có thể tiếp tục gọi thêm món. Các món mới sẽ được thêm vào đơn hàng này.
+                                                </div> -->
 
             @elseif($order->status == 'served')
                 {{-- Đã hoàn thành - Chờ thanh toán --}}
@@ -161,9 +161,9 @@
                 </a>
 
                 <!-- <div class="alert alert-warning mt-3">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Các món đã được phục vụ xong. Vui lòng thanh toán để hoàn tất.
-                                                </div> -->
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                            Các món đã được phục vụ xong. Vui lòng thanh toán để hoàn tất.
+                                                        </div> -->
 
             @elseif($order->status == 'paid')
                 {{-- Đã thanh toán --}}

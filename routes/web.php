@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 // CONTROLLERS
 use App\Http\Controllers\UsersController;
@@ -14,8 +13,6 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ReportController;// THÊM DÒNG NÀY
-use Illuminate\Support\Facades\Auth;
 
 // RESERVATION CONTROLLERS
 use App\Http\Controllers\Customer\ReservationController as CustomerReservationController;
@@ -42,6 +39,19 @@ Route::get('/db-test', function () {
     } catch (\Exception $e) {
         return "❌ Lỗi kết nối DB: " . $e->getMessage();
     }
+});
+
+//
+
+Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::get('/admin/tables', [TableController::class, 'index'])->name('tables.index');
+    Route::get('/admin/tables/create', [TableController::class, 'create'])->name('tables.create');
+    Route::post('/admin/tables', [TableController::class, 'store'])->name('tables.store');
+    Route::get('/admin/tables/{id}/edit', [TableController::class, 'edit'])->name('tables.edit');
+    Route::put('/admin/tables/{id}', [TableController::class, 'update'])->name('tables.update');
+    Route::delete('/admin/tables/{id}', [TableController::class, 'destroy'])->name('tables.destroy');
+
 });
 
 /*
@@ -112,6 +122,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/table/{table}/order/create', [OrderController::class, 'create'])->name('table.order.create');
     Route::post('/table/{table}/order', [OrderController::class, 'store'])->name('table.order.store');
 
+    // Đánh dấu hoàn thành đơn hàng (chỉ staff/admin)
+    Route::post('/orders/{id}/complete', [OrderController::class, 'markAsCompleted'])
+        ->name('orders.complete');
+
     // DASHBOARD ADMIN
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('Dashboard');
 
@@ -126,7 +140,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 });
 
-});
+
 
 /*
 |--------------------------------------------------------------------------

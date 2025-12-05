@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\RestaurantTable;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class TableController extends Controller
@@ -102,7 +103,6 @@ class TableController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-
         return redirect()->route('tables.index')->with('success', 'Thêm bàn thành công');
     }
 

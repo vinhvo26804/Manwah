@@ -5,7 +5,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
-
 {
     use HasFactory;
 
@@ -37,27 +36,27 @@ class Order extends Model
     {
         return $this->belongsTo(RestaurantTable::class);
     }
-      public function getCalculatedTotalAttribute()
+    public function getCalculatedTotalAttribute()
     {
-        return $this->items->sum(function($item) {
+        return $this->items->sum(function ($item) {
             return $item->price * $item->quantity;
         });
     }
-        public function getDisplayTotalAttribute()
+    public function getDisplayTotalAttribute()
     {
         $calculatedTotal = $this->calculated_total;
-        
+
         // Nếu total trong DB khác với tính toán, có thể cập nhật lại
         if ($this->total != $calculatedTotal) {
             // Có thể tự động cập nhật ở đây nếu muốn
             // $this->update(['total' => $calculatedTotal]);
         }
-        
+
         return $calculatedTotal > 0 ? $calculatedTotal : $this->total;
     }
-        public function scopeForUser($query, $userId = null)
+    public function scopeForUser($query, $userId = null)
     {
         return $query->where('user_id', $userId ?? auth()->id());
     }
-    
+
 }

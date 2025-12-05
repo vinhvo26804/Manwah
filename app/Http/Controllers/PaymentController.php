@@ -113,7 +113,6 @@ class PaymentController extends Controller
                 "&redirectUrl=" . $this->returnUrl .
                 "&requestId=" . $requestId .
                 "&requestType=captureWallet";
-                // "&autoCapture=true";  // Thêm cho v3
             Log::info('Raw Hash for Signature:', ['rawHash' => $rawHash]);
             $signature = hash_hmac('sha256', $rawHash, $this->secretKey);
             Log::info('Generated Signature:', ['signature' => $signature]);
@@ -128,7 +127,6 @@ class PaymentController extends Controller
                 'lang' => 'vi',
                 'extraData' => '',
                 'requestType' => 'captureWallet',
-                // 'autoCapture' => true,  // Thêm cho v3
                 'signature' => $signature
             ];
             Log::info('MoMo Request Payload:', $payload);
@@ -152,7 +150,6 @@ class PaymentController extends Controller
                     'status' => 'pending',
                     'momo_request_id' => $requestId
                 ]);
-
                 if ($order->table) {
                     $order->table->update(['status' => 'available']);
                 }
@@ -318,7 +315,6 @@ class PaymentController extends Controller
                 Log::warning('Invalid IPN signature');
                 return response()->json(['error' => 'Invalid signature'], 400);
             }
-
             $momoOrderId = $params['orderId'];
             $orderId = explode('_', $momoOrderId)[1];
 
@@ -481,7 +477,6 @@ class PaymentController extends Controller
     {
         try {
             $order = Order::findOrFail($orderId);
-
             // Validate thông tin thẻ (tùy chọn, để giả lập)
             $request->validate([
                 'card_number' => 'required|string',
