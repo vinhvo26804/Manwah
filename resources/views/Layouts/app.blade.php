@@ -147,6 +147,11 @@
                                             <i class="fas fa-cog me-2"></i>Quản lý đơn hàng
                                         </a>
                                     </li>
+                                       <li>
+                                        <a class="dropdown-item" href="{{ route('tables.index') }}">
+                                            <i class="fas fa-chair me-2"></i>Quản lý bàn
+                                        </a>
+                                    </li>
                                 @endif
 
                                 <li>

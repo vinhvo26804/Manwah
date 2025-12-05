@@ -103,6 +103,7 @@ class TableController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
         return redirect()->route('tables.index')->with('success', 'Thêm bàn thành công');
     }
 
