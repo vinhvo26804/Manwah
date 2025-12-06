@@ -12,27 +12,43 @@
     body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
     .hero{
       min-height:64vh;
-      background-image: url(../storage/app/public/images/landing_hero.jpg);
-      background-size:cover;
+      background-image: url('{{ asset('storage/images/landing_hero.jpg') }}');
+      background-size: 80% auto;
       background-position:center;
+      background-color: ;
+    background-repeat: no-repeat;       /* không lặp nữa */
+
+  padding-left: 10%;
+    padding-right: 10%;
       color:#fff;
       display:flex;
       align-items:center;
       position:relative;
     }
-    .overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45)}
+    .overlay{position:absolute;inset:0;}
     .hero .container{position:relative;z-index:2}
     .card-menu img{height:120px;object-fit:cover;width:100%;border-radius:6px}
     .gallery img{width:100%;height:160px;object-fit:cover;border-radius:6px}
     footer{background:#0b0b0b;color:#ddd;padding:30px 0}
     .btn-primary{background:#d43c3c;border:0}
+
+ .gallery-img {
+  width: 100%;
+  height: 380px;        /* ẢNH RẤT TO */
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+
   </style>
 </head>
 <body>
   <!-- Header -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="#">Manwah</a>
+      <a class="navbar-brand fw-bold" href="#">
+        <img src="https://manwah.com.vn/images/logo/manwah.svg" alt="Manwah Logo" height="40">
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navNav" aria-controls="navNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -52,14 +68,14 @@
   <!-- Hero -->
   <header class="hero">
     <div class="overlay"></div>
-    <div class="container text-center text-white">
+    <!-- <div class="container text-center text-white">
       <h1 class="display-5 fw-bold">Manwah — Lẩu Đài Loan chính hiệu</h1>
       <p class="lead">Hương vị đậm đà, nguyên liệu tươi ngon — phù hợp cho gia đình & bạn bè</p>
       <div class="d-flex justify-content-center gap-2">
         <a href="#menu" class="btn btn-primary btn-lg">Xem thực đơn</a>
         <a href="#contact" class="btn btn-outline-light btn-lg">Đặt bàn</a>
       </div>
-      <p class="mt-3 small">Trang này có thể xem mà không cần đăng nhập — khách hàng dễ tiếp cận thông tin.</p>
+      <p class="mt-3 small">Trang này có thể xem mà không cần đăng nhập — khách hàng dễ tiếp cận thông tin.</p> -->
     </div>
   </header>
 
@@ -69,16 +85,22 @@
       <div class="row align-items-center">
         <div class="col-md-6">
           <h3>Về Manwah</h3>
-          <p>Manwah là chuỗi lẩu tiêu biểu mang hương vị Đài Loan, với nước lẩu đặc trưng, gia vị tươi và nhiều loại topping. Không gian ấm cúng, phù hợp các buổi tụ họp.</p>
-          <ul>
+<p>
+  Sau hàng trăm năm tồn tại trong cuộc sống người Đài, lẩu Đài Loan không chỉ đơn thuần là sự kết hợp của các nguyên liệu quen thuộc, mà liên tục được cải tiến và hoàn thiện, từ thế hệ này sang thế hệ khác. Thực khách đến Manwah sẽ được tự mình khám phá hành trình ẩm thực đặc sắc với nước lẩu ngọt vị tự nhiên, kết hợp hầm cùng các loại gia vị dậy mùi thơm đặc trưng của Đài Loan. Nét đặc sắc không chỉ đến từ nước lẩu, mà còn đến từ cả những món nhúng kiểu Đài – bạn sẽ tìm thấy nhiều hơn là chỉ thịt bò và các loại rau thơm. Chính sự kết hợp các nguyên liệu, món ăn hài hoà sẽ tạo nên hương vị lẩu Đài Loan tỉ mỉ và tinh tế.
+</p>          <ul>
             <li>Đa dạng nước lẩu: Mala, Cà chua, Nấm, Thanh đạm</li>
             <li>Buffet & gọi món — phù hợp theo nhóm</li>
             <li>Ưu đãi đặt bàn trực tuyến</li>
           </ul>
         </div>
-        <div class="col-md-6">
-          <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=800&q=80" alt="Lẩu" class="img-fluid rounded shadow">
-        </div>
+        <div class="col-md-6 d-flex gap-2">
+    <img src="{{ asset('storage/images/manwah-aboutscaled.jpg') }}"
+         class="img-fluid rounded shadow flex-fill" style="max-width: 50%;" alt="">
+
+    <img src="{{ asset('storage/images/manwah_about.jpg') }}"
+         class="img-fluid rounded shadow flex-fill" style="max-width: 50%;" alt="">
+</div>
+
       </div>
     </div>
   </section>
@@ -86,13 +108,13 @@
   <!-- Menu highlights -->
   <section id="menu" class="py-5 bg-light">
     <div class="container">
-      <h3 class="mb-4">Món nổi bật</h3>
+      <h3 class="mb-4 font-weight:bolder">Buffet</h3>
       <div class="row g-3">
         <div class="col-md-4">
           <div class="card p-3 card-menu h-100">
-            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" alt="Set lẩu">
+            <img src="{{ asset('storage/images/Phong_Van279.jpg') }}" alt="Set lẩu">
             <div class="card-body p-0 mt-2">
-              <h5 class="mb-1">Set Lẩu Phong Vân</h5>
+              <h5 class="mb-1">  Phong Vân</h5>
               <p class="small mb-0">Set cho 2-3 người — nhiều topping, nước lẩu đặc trưng.</p>
               <p class="mt-2 fw-bold">Từ 259.000 đ</p>
             </div>
@@ -100,21 +122,21 @@
         </div>
         <div class="col-md-4">
           <div class="card p-3 card-menu h-100">
-            <img src="https://images.unsplash.com/photo-1604908176940-20f49a4f3b4b?auto=format&fit=crop&w=800&q=80" alt="Hải sản">
+            <img src="{{ asset('storage/images/dai_nguu_tran_379.jpg') }}" alt="Hải sản">
             <div class="card-body p-0 mt-2">
-              <h5 class="mb-1">Combo Hải Sản Tươi</h5>
-              <p class="small mb-0">Tôm, mực, sò — phù hợp ăn cùng lẩu nấm.</p>
-              <p class="mt-2 fw-bold">Từ 199.000 đ</p>
+              <h5 class="mb-1"> Đài Ngưu Trân</h5>
+              <p class="small mb-0">Hải sản và nhiều loại thịt bò nhập khẩu thượng hạn — phù hợp ăn cùng lẩu nấm.</p>
+              <p class="mt-2 fw-bold">399.000/người</p>
             </div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="card p-3 card-menu h-100">
-            <img src="https://images.unsplash.com/photo-1604908177199-9f2b3a1a6f2e?auto=format&fit=crop&w=800&q=80" alt="Rau nấm">
+            <img src="{{ asset('storage/images/DaiNguuHoa469.jpg') }}" alt="Rau nấm">
             <div class="card-body p-0 mt-2">
-              <h5 class="mb-1">Đĩa Rau & Nấm</h5>
-              <p class="small mb-0">Rau xanh tươi và nấm đa dạng — bù vị cho nước lẩu.</p>
-              <p class="mt-2 fw-bold">Từ 79.000 đ</p>
+              <h5 class="mb-1">Đài Ngưu Hoa </h5>
+              <p class="small mb-0">Thịt bò nhâp khẩu, hải sản thượng hang, Và đặc biệt có các loại thịt bò tươi..</p>
+              <p class="mt-2 fw-bold">Từ 469.000/người</p>
             </div>
           </div>
         </div>
@@ -127,17 +149,26 @@
   </section>
 
   <!-- Gallery -->
-  <section id="gallery" class="py-5">
-    <div class="container">
-      <h3 class="mb-4">Gallery</h3>
-      <div class="row g-3 gallery">
-        <div class="col-6 col-md-3"><img src="https://images.unsplash.com/photo-1550317138-10000687a72b?auto=format&fit=crop&w=600&q=80" alt="photo"></div>
-        <div class="col-6 col-md-3"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" alt="photo"></div>
-        <div class="col-6 col-md-3"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80" alt="photo"></div>
-        <div class="col-6 col-md-3"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" alt="photo"></div>
+<section id="gallery" class="py-5">
+  <div class="container">
+    <h3 class="mb-4">Gallery</h3>
+    <div class="row g-3 gallery">
+      <div class="col-6 col-md-3">
+        <img class="gallery-img" src="https://brand-pcms.ggg.systems/media/catalog/product/cache/fccf9bc1c56510f6f2e84ded9c30a375/1/9/19259_combo-phuc-di-tuong.jpg" alt="photo">
+      </div>
+      <div class="col-6 col-md-3">
+        <img class="gallery-img" src="https://brand-pcms.ggg.systems/media/catalog/product/cache/fccf9bc1c56510f6f2e84ded9c30a375/s/e/set_nt-web.png" alt="photo">
+      </div>
+      <div class="col-6 col-md-3">
+        <img class="gallery-img" src="https://brand-pcms.ggg.systems/media/catalog/product/cache/fccf9bc1c56510f6f2e84ded9c30a375/1/9/19258_combo-phuc-di-an.jpg" alt="photo">
+      </div>
+      <div class="col-6 col-md-3">
+        <img class="gallery-img" src="https://brand-pcms.ggg.systems/media/catalog/product/cache/fccf9bc1c56510f6f2e84ded9c30a375/s/o/song-vu-web.png" alt="photo">
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
 
   <!-- Contact / Location -->
   <section id="contact" class="py-5 bg-light">
