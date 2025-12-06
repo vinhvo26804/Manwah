@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('content')
     <title>Dashboard</title>
-    <div class="container-fluid">
-        <div class="row">
+    <div class="container-fluid ">
+        <div class="row ">
             <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 bg-dark text-white min-vh-100 p-3">
                 <h3 class="text-center mb-4">Admin Panel</h3>

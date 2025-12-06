@@ -132,15 +132,20 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UsersController::class)->except(['show']);
     Route::resource('products', ProductController::class)->except(['show']);
 
-    // QUẢN LÝ ĐƠN HÀNG
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+   
+});
+// Staff cũng xem được order
+Route::middleware(['auth'])->group(function(){
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-    //Report
-    Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+        Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+
 });
 
-
+// Admin mới xem được danh sách order + báo cáo
+Route::middleware(['auth', 'admin'])->group(function(){
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+});
 
 /*
 |--------------------------------------------------------------------------

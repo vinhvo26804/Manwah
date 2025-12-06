@@ -499,12 +499,16 @@ class PaymentController extends Controller
                 Log::info("Simulated MoMo payment success for order {$orderId}");
                 return redirect()->route('payment.success', $orderId)->with('success', 'Thanh toán MoMo thành công (giả lập)!');
             } else {
-                return back()->with('error', 'Thông tin thẻ không hợp lệ. Sử dụng thông tin test từ docs MoMo.');
+                return back()
+                ->withInput()
+                ->with('error', 'Thông tin thẻ không hợp lệ. Sử dụng thông tin test từ docs MoMo.');
             }
 
         } catch (\Exception $e) {
             Log::error('Simulate MoMo payment error: ' . $e->getMessage());
-            return back()->with('error', 'Lỗi giả lập thanh toán: ' . $e->getMessage());
+            return back()
+            ->withInput()
+            ->with('error', 'Lỗi giả lập thanh toán: ' . $e->getMessage());
         }
     }
     public function showSuccess($orderId)

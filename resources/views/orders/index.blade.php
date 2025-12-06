@@ -65,14 +65,14 @@
                                     <td>
                                         <p class="text-xs font-weight-bold mb-0">
                                             @if($order->table)
-                                                Bàn {{ $order->table->name }}
+                                                 {{ $order->table->table_number }}
                                             @else
                                                 <span class="text-muted">N/A</span>
                                             @endif
                                         </p>
                                     </td>
                                     <td>
-                                        <p class="text-xs font-weight-bold mb-0">{{ number_format($order->total) }}đ</p>
+                                        <p class="text-xs font-weight-bold mb-0">{{ number_format($order->total_amount) }}đ</p>
                                     </td>
                                     <td>
                                         @if($order->status == 'pending')

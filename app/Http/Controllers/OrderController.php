@@ -164,7 +164,7 @@ class OrderController extends Controller
         $order = Order::with(['items.product', 'table', 'user'])->findOrFail($id);
 
         // Kiểm tra quyền xem đơn hàng
-        if (!auth()->user()->isAdmin() && !auth()->user()->isStaff()) {
+        if (!auth()->user() == 'admin' && !auth()->user()== 'staff') {
             $tableId = session('table_id');
             if ($order->table_id != $tableId) {
                 return redirect()->route('orders.index')
@@ -180,7 +180,7 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
 
-        if (!auth()->user()->isAdmin() && !auth()->user()->isStaff()) {
+        if (!auth()->user() == 'admin' && !auth()->user()== 'staff') {
             return back()->with('error', 'Chỉ nhân viên mới có thể đánh dấu hoàn thành');
         }
 

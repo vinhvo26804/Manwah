@@ -12,6 +12,9 @@ class UsersController extends Controller
     }
 
     public function create() {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('users.index')->with('error', 'Bạn không có quyền thêm user mới.');
+        }
         return view('users.create');
     }
 
@@ -38,6 +41,9 @@ class UsersController extends Controller
     }
 
     public function edit(User $user) {
+        if(!auth()-> user()-> isAdmin()){
+            abort(403,'Bạn không có quyền sửa thông tin User');
+        }
         return view('users.edit', compact('user'));
     }
 
@@ -62,6 +68,9 @@ class UsersController extends Controller
     }
 
     public function destroy(User $user) {
+        if(auth()->user()!= 'admin'){
+            return redirect()->route('users.index')->with('error','Bạn không có quyền xóa User');
+        }
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Xóa user thành công!');
     }

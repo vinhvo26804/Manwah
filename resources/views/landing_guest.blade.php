@@ -34,7 +34,7 @@
 
  .gallery-img {
   width: 100%;
-  height: 380px;        /* ẢNH RẤT TO */
+  height: 380px;        
   object-fit: cover;
   border-radius: 12px;
 }

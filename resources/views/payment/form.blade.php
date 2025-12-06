@@ -97,7 +97,7 @@
 
 <body>
     <div class="container">
-        <h1>💳 Thanh toán đơn hàng</h1>
+        <h1>Thanh toán đơn hàng</h1>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -122,6 +122,7 @@
                 <h4>Chi tiết món ăn:</h4>
                 @foreach($order->items as $item)
                     <div class="order-item">
+                        <span>{{$item->product->name}}</span>
                         <span>{{ $item->name }} x {{ $item->quantity }}</span>
                         <span>{{ number_format($item->price * $item->quantity) }}đ</span>
                     </div>
@@ -141,12 +142,7 @@
         </div>
 
         @if(in_array($order->status, ['pending', 'pending_payment', 'served']))
-            <div class="test-info">
-                <h4>🧪 Thông tin test MoMo Sandbox:</h4>
-                <p><strong>Số điện thoại test:</strong> 0334456789 hoặc 0987654321</p>
-                <p><strong>Mật khẩu/OTP:</strong> 123456</p>
-                <p><strong>Thẻ test:</strong> 9704198526191432198 (NGUYEN VAN A)</p>
-            </div>
+          
 
             <form action="{{ route('payment.process', $order->id) }}" method="POST" id="paymentForm">
                 @csrf
@@ -156,27 +152,27 @@
                     <div class="payment-method" onclick="selectPayment('momo')">
                         <label>
                             <input type="radio" name="payment_method" value="momo" required>
-                            <strong>📱 Ví MoMo</strong> - Thanh toán qua ứng dụng MoMo
+                            <strong>Ví MoMo</strong> - Thanh toán qua ứng dụng MoMo
                         </label>
                     </div>
 
                     <div class="payment-method" onclick="selectPayment('cash')">
                         <label>
                             <input type="radio" name="payment_method" value="cash">
-                            <strong>💵 Tiền mặt</strong> - Thanh toán khi nhận hàng
+                            <strong>Tiền mặt</strong> - Thanh toán khi nhận hàng
                         </label>
                     </div>
 
-                    <div class="payment-method" onclick="selectPayment('bank')">
+                    <!-- <div class="payment-method" onclick="selectPayment('bank')">
                         <label>
                             <input type="radio" name="payment_method" value="bank">
-                            <strong>🏦 Chuyển khoản ngân hàng</strong>
+                            <strong>Chuyển khoản ngân hàng</strong>
                         </label>
-                    </div>
+                    </div> -->
                 </div>
 
                 <button type="submit" class="btn-payment" id="submitBtn">
-                    🚀 Xác nhận thanh toán
+                     Xác nhận thanh toán
                 </button>
             </form>
         @else
@@ -205,9 +201,9 @@
             // Update button text
             const btn = document.getElementById('submitBtn');
             if (method === 'momo') {
-                btn.innerHTML = '🚀 Chuyển đến MoMo để thanh toán';
+                btn.innerHTML = 'Chuyển đến MoMo để thanh toán';
             } else {
-                btn.innerHTML = '🚀 Xác nhận thanh toán';
+                btn.innerHTML = 'Xác nhận thanh toán';
             }
         }
 

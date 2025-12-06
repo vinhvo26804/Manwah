@@ -49,10 +49,10 @@
         $tableId = session('table_id') ?? null;
     @endphp
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/dashboard') }}">
-                <i class="fas fa-utensils me-2"></i>Manwah Restaurant
+        <img src="https://manwah.com.vn/images/logo/manwah.svg" alt="Manwah Logo" height="50">
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -126,11 +126,13 @@
                                 @endif
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li>
+                                <!-- <li>
+                                    @if ($userId = Auth::id())
                                     <a class="dropdown-item" href="{{ route('orders.index') }}">
                                         <i class="fas fa-list me-2"></i>Đơn hàng của tôi
                                     </a>
-                                </li>
+                                    @endif
+                                </li> -->
 
                                  <li>
                                     <a class="dropdown-item" href="{{ route('reservations.history') }}">

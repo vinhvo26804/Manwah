@@ -16,6 +16,9 @@ class ProductController extends Controller
 
     public function create()
     {
+        if(auth()->user() != 'admin'){
+            return redirect()->route('products.index')->with('error','Bạn không có quyền thêm sản phẩm mới');
+        }
         $categories = Category::all();
         return view('products.create', compact('categories'));
     }
@@ -35,6 +38,9 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        if(auth()->user() != 'admin'){
+            return redirect()->route('products.index')->with('error','Bạn không có quyền sửa sản phẩm');
+        }
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }
@@ -53,6 +59,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if(auth()->user() != 'admin'){
+            return redirect()->route('products.index')->with('error','Bạn không có quyền xóa sản phẩm');
+        }
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
