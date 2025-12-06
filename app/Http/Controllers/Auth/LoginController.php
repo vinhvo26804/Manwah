@@ -25,7 +25,18 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/dashboard'; //redirect đến dashboard sau login
+    // protected $redirectTo = '/dashboard';
+     //redirect đến dashboard sau login
+     protected function redirectTo()
+     {
+         $user = auth()->user();
+            
+         if($user->isCustomer()){
+                return  route('landing');
+         }else{
+                return route('Dashboard');
+        }
+     }
 
     /**
      * Create a new controller instance.

@@ -132,6 +132,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UsersController::class)->except(['show']);
     Route::resource('products', ProductController::class)->except(['show']);
 
+    
+    Route::get('/profile', [UsersController::class, 'profile'])->name('users.profile');
+
    
 });
 // Staff cũng xem được order

@@ -59,7 +59,47 @@
           <li class="nav-item"><a class="nav-link" href="#menu">Thực đơn</a></li>
           <li class="nav-item"><a class="nav-link" href="#gallery">Gallery</a></li>
           <li class="nav-item"><a class="nav-link" href="#contact">Liên hệ</a></li>
+  @guest
+    
           <li class="nav-item ms-3"><a class="btn btn-outline-primary" href="{{ route('login') }}">Đăng nhập</a></li>
+          @else
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i>{{ Auth::user()->full_name }}
+                                @if(Auth::user()->isAdmin())
+                                    <span class="badge bg-danger ms-1">Admin</span>
+                                @elseif(Auth::user()->isStaff())
+                                    <span class="badge bg-warning ms-1">Staff</span>
+                                @endif
+                                
+                            </a>
+
+                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                          <li>
+                                        <a class="dropdown-item" href="{{ route('users.profile') }}">
+                                            <i class="fas fa-cog me-2"></i>Thông tin cá nhân
+                                        </a>
+                                    </li>
+                                                          <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                                           <li>
+                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                    </a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </li>
+                                                          </ul>
+
+                            
+                               
+                            
+          @endguest
+
         </ul>
       </div>
     </div>
