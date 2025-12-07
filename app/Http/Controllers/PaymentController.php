@@ -284,16 +284,15 @@ class PaymentController extends Controller
         }
         $responseSignature = $params['signature'];
 
-        // Thứ tự CHÍNH XÁC cho callback/IPN (bao gồm orderType và payType)
         $rawHash = "accessKey=" . $this->accessKey .
             "&amount=" . $params['amount'] .
             "&extraData=" . $params['extraData'] .
             "&message=" . $params['message'] .
             "&orderId=" . $params['orderId'] .
             "&orderInfo=" . $params['orderInfo'] .
-            "&orderType=" . ($params['orderType'] ?? '') .  // Thêm nếu thiếu
+            "&orderType=" . ($params['orderType'] ?? '') .  
             "&partnerCode=" . $params['partnerCode'] .
-            "&payType=" . ($params['payType'] ?? '') .      // Thêm nếu thiếu
+            "&payType=" . ($params['payType'] ?? '') .      
             "&requestId=" . $params['requestId'] .
             "&responseTime=" . $params['responseTime'] .
             "&resultCode=" . $params['resultCode'] .
@@ -302,7 +301,7 @@ class PaymentController extends Controller
         return hash_equals($calculatedSignature, $responseSignature);
     }
     /**
-     * IPN Handler - THEO CHUẨN MOMO
+     * IPN Handler 
      */
     public function momoIPN(Request $request)
     {
@@ -310,7 +309,6 @@ class PaymentController extends Controller
         Log::info('=== MOMO IPN RECEIVED ===', $params);
 
         try {
-            // Verify IPN signature
             if (!$this->verifyCallbackSignature($params)) {
                 Log::warning('Invalid IPN signature');
                 return response()->json(['error' => 'Invalid signature'], 400);

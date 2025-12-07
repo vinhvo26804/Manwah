@@ -4,8 +4,8 @@
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="card shadow-lg" style="max-width: 500px; width: 100%; border: none; border-radius: 15px;">
         <!-- Header với logo MoMo giả lập -->
-        <div class="card-header text-center bg-primary text-white" style="background-color: #00AEEF !important; border-radius: 15px 15px 0 0;">
-            <img src="https://developers.momo.vn/v2/img/logo-momo.png" alt="MoMo Logo" style="height: 40px; margin-bottom: 10px;"> <!-- Logo MoMo từ URL công khai -->
+        <div class="card-header text-center bg-primary text-white" style="background-color: #A50064 !important; border-radius: 15px 15px 0 0;">
+            <img src="https://img.mservice.com.vn/app/img/portal_documents/mini-app_design-guideline_branding-guide-1-2.png" alt="MoMo Logo" style="height: 40px; margin-bottom: 10px;"> <!-- Logo MoMo từ URL công khai -->
             <h4 class="mb-0">Thanh Toán Thành Công</h4>
         </div>
         
@@ -13,7 +13,7 @@
         <div class="card-body text-center p-4">
             <!-- Icon thành công -->
             <div class="mb-3">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: #28a745;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color:#A50064;">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
                     <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -32,7 +32,7 @@
                 <div class="col-6">MoMo</div>
                 
                 <div class="col-6"><strong>Trạng Thái:</strong></div>
-                <div class="col-6"><span class="badge bg-success">Thành Công</span></div>
+                <div class="col-6"><span class="badge bg-success ">Thành Công</span></div>
                 
                 <div class="col-6"><strong>Mã Giao Dịch:</strong></div>
                 <div class="col-6">{{ $order->transaction_id ?? 'N/A' }}</div>
@@ -49,7 +49,7 @@
         
         <!-- Footer với nút hành động -->
         <div class="card-footer text-center bg-light" style="border-radius: 0 0 15px 15px;">
-            <a href="{{ route('Dashboard') }}" class="btn btn-primary me-2" style="background-color: #00AEEF; border-color: #00AEEF;">Quay Lại Trang Chủ</a>
+            <a href="{{ route('Dashboard') }}" class="btn btn-primary me-2" style="background-color: #A50064; border-color: #A50064;">Quay Lại Trang Chủ</a>
             <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline-primary">Xem Chi Tiết Đơn Hàng</a>
         </div>
     </div>
